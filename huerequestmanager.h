@@ -80,8 +80,7 @@ public:
         std::vector<double> *xy = this->getRGBtoXY(r, g, b);
         double x = xy->at(0), y = xy->at(1);
 
-        QUrl url_1("http://192.168.0.45/api/bqdaMSCscyVhBgZhkrF5ptFm2-NhJSAAg3rVmskl/lights/1/state");
-        QUrl url_2("http://192.168.0.45/api/bqdaMSCscyVhBgZhkrF5ptFm2-NhJSAAg3rVmskl/lights/2/state");
+        QUrl url_1("http://192.168.0.45/api/bqdaMSCscyVhBgZhkrF5ptFm2-NhJSAAg3rVmskl/groups/1/action");
 
         QNetworkRequest req_1, req_2;
 
@@ -90,13 +89,10 @@ public:
 
         req_1.setUrl(url_1);
         req_1.setHeader(QNetworkRequest::ContentTypeHeader, QVariant("application/json"));
-        req_2.setUrl(url_2);
-        req_2.setHeader(QNetworkRequest::ContentTypeHeader, QVariant("application/json"));
 
         QByteArray data(data_stream.str().c_str());
 
         mgr->put(req_1, data);
-        mgr->put(req_2, data);
     }
 };
 
