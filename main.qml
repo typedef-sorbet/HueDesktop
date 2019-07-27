@@ -96,6 +96,8 @@ Window {
     }
 
     Rectangle {
+        id: color_preview
+
         width: 50; height: 50
 
         border.color: "black"
@@ -107,6 +109,52 @@ Window {
 
         onColorChanged: {
             console.log("Color changed to " + color)
+        }
+    }
+
+    Text {
+        id: hash_sign
+
+        text: "#"
+        font.pointSize: 12
+
+        anchors.margins: 3
+        anchors.right: hex_edit.left
+        anchors.verticalCenter: hex_edit.verticalCenter
+    }
+
+    TextField {
+        id: hex_edit
+
+        text: Qt.rgba(red_slider.value / 255, green_slider.value / 255, blue_slider.value / 255, 1.0).toString().substring(1, 8)
+        font.pointSize: 12
+        font.family: "Courier New"
+
+        width: 75; height: 30
+        anchors.margins: 10
+        anchors.top: color_preview.bottom
+        anchors.horizontalCenter: color_preview.horizontalCenter
+
+        onTextEdited: {
+            if (text.length == 6) {
+                var red = parseInt(text.substring(0, 2), 16)
+                var green = parseInt(text.substring(2, 4), 16)
+                var blue = parseInt(text.substring(4, 6), 16)
+
+                if((!red && red !== 0) || (!green && green !== 0) || (!blue && blue !== 0))
+                {
+                    console.log("bad text given to hex_edit")
+                    return;
+                }
+
+                red_slider.value = red
+                green_slider.value = green
+                blue_slider.value = blue
+
+                color_preview.color = text + "ff"
+
+                manager.changeLights(red, green, blue)
+            }
         }
     }
 }
