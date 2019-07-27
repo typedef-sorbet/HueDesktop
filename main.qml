@@ -151,7 +151,7 @@ Window {
                 green_slider.value = green
                 blue_slider.value = blue
 
-                color_preview.color = text + "ff"
+                color_preview.color = Qt.rgba(red / 255, green / 255, blue / 255, 1.0)
 
                 manager.changeLights(red, green, blue)
             }
