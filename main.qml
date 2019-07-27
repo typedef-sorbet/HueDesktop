@@ -107,6 +107,11 @@ Window {
 
         color: Qt.rgba(red_slider.value / 255, green_slider.value / 255, blue_slider.value / 255, 1.0)
 
+        Binding on color {
+            when: hex_edit.activeFocus
+            value: hex_edit.text.length == 6 ? Qt.rgba(parseInt(hex_edit.text.substring(0, 2), 16) / 255, parseInt(hex_edit.text.substring(2, 4), 16) / 255, parseInt(hex_edit.text.substring(4, 6), 16) / 255, 1.0) : Qt.rgba(red_slider.value / 255, green_slider.value / 255, blue_slider.value / 255, 1.0)
+        }
+
         onColorChanged: {
             console.log("Color changed to " + color)
         }
@@ -150,8 +155,6 @@ Window {
                 red_slider.value = red
                 green_slider.value = green
                 blue_slider.value = blue
-
-                color_preview.color = Qt.rgba(red / 255, green / 255, blue / 255, 1.0)
 
                 manager.changeLights(red, green, blue)
             }
