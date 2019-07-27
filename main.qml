@@ -2,8 +2,11 @@ import QtQuick 2.11
 import QtQuick.Window 2.11
 import QtQuick.Controls 2.3
 import com.sanctity 1.0
+import "Utilities.js" as Utils
 
 Window {
+    id: window
+
     visible: true
     width: 300
     height: 480
@@ -12,7 +15,7 @@ Window {
     color: "lightgrey"
 
     HueRequestManager {
-        id: manager
+        id: manager 
     }
 
     Slider {
@@ -33,7 +36,7 @@ Window {
         onPressedChanged: {
             if(!pressed)
             {
-                manager.changeLights(value, green_slider.value, blue_slider.value)
+                manager.changeLights(value, green_slider.value, blue_slider.value, Utils.calc_alpha(value, green_slider.value, blue_slider.value))
             }
         }
     }
@@ -56,7 +59,7 @@ Window {
         onPressedChanged: {
             if(!pressed)
             {
-                manager.changeLights(red_slider.value, value, blue_slider.value)
+                manager.changeLights(red_slider.value, value, blue_slider.value, Utils.calc_alpha(red_slider.value, value, blue_slider.value))
             }
         }
     }
@@ -86,7 +89,7 @@ Window {
         onPressedChanged: {
             if(!pressed)
             {
-                manager.changeLights(red_slider.value, green_slider.value, value)
+                manager.changeLights(red_slider.value, green_slider.value, value, Utils.calc_alpha(red_slider.value, green_slider.value, value))
             }
         }
     }
@@ -156,7 +159,7 @@ Window {
                 green_slider.value = green
                 blue_slider.value = blue
 
-                manager.changeLights(red, green, blue)
+                manager.changeLights(red, green, blue, Utils.calc_alpha(red, green, blue))
             }
         }
     }
