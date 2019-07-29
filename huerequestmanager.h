@@ -72,14 +72,28 @@ protected:
 public:
     // Constants
     static const bool LIGHTS_OFF = false;
-    static const int LIGHTS_ON = true;
+    static const bool LIGHTS_ON = true;
+    bool current_power_state;
+    std::tuple<float, float, float, int> *buffered_request;
     explicit HueRequestManager(QObject *parent = 0) : QObject(parent) {
         mgr = new QNetworkAccessManager(this);
+        current_power_state = true;
+        buffered_request = nullptr;
     }
 
     Q_INVOKABLE void changeLights(float r, float g, float b, int bri)
     {
-        qDebug() << "Recieved request to change lights to color (" << r << ", " << g << ", " << b << ", " << bri << ")";
+        qDebug() << "Recieved request to change lights to color (" << r << "," << g << "," << b << "," << bri << ").";
+
+        if(current_power_state == LIGHTS_OFF)
+        {
+            qDebug() << "Buffering the request.";
+
+            free(buffered_request);
+            buffered_request = new std::tuple<float, float, float, int>(r, g, b, bri);
+
+            return;
+        }
 
         // TODO scale for multiple lights? I don't exactly intend for this to go public, so I wouldn't need to do this for a while, if at all...
         std::vector<double> *xy = this->getRGBtoXY(r, g, b);
@@ -110,7 +124,18 @@ public:
 
         std::ostringstream string_builder;
 
-        string_builder << "{\"on\": " << (onOrOff ? "true" : "false") << "}";
+        string_builder << "{\"on\": " << (onOrOff ? "true" : "false");
+
+        if(onOrOff && buffered_request)
+        {
+            qDebug() << "Packaging \"on\" request with previously buffered color change request.";
+            std::vector<double> *xy = this->getRGBtoXY(std::get<0>(*buffered_request), std::get<1>(*buffered_request), std::get<2>(*buffered_request));
+            string_builder << ", \"xy\": [" << xy->at(0) << ", " << xy->at(1) << "], \"bri\": " << std::get<3>(*buffered_request);
+            free(buffered_request);
+            buffered_request = nullptr;
+        }
+
+        string_builder << "}";
 
         req.setUrl(url);
         req.setHeader(QNetworkRequest::ContentTypeHeader, QVariant("application/json"));
@@ -118,6 +143,8 @@ public:
         QByteArray data(string_builder.str().c_str());
 
         mgr->put(req, data);
+
+        current_power_state = onOrOff;
     }
 };
 
