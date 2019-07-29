@@ -11,7 +11,7 @@ Window {
     visible: true
     width: 300
     height: 480
-    title: qsTr("Hello World")
+    title: qsTr("Hue Lights Controller")
 
     color: "lightgrey"
 
@@ -37,7 +37,7 @@ Window {
         onPressedChanged: {
             if(!pressed)
             {
-                manager.changeLights(value, green_slider.value, blue_slider.value, Utils.calc_alpha(value, green_slider.value, blue_slider.value))
+                manager.changeLights(value, green_slider.value, blue_slider.value, brightness_slider.value)
             }
         }
     }
@@ -60,7 +60,7 @@ Window {
         onPressedChanged: {
             if(!pressed)
             {
-                manager.changeLights(red_slider.value, value, blue_slider.value, Utils.calc_alpha(red_slider.value, value, blue_slider.value))
+                manager.changeLights(red_slider.value, value, blue_slider.value, brightness_slider.value)
             }
         }
     }
@@ -90,13 +90,51 @@ Window {
         onPressedChanged: {
             if(!pressed)
             {
-                manager.changeLights(red_slider.value, green_slider.value, value, Utils.calc_alpha(red_slider.value, green_slider.value, value))
+                manager.changeLights(red_slider.value, green_slider.value, value, brightness_slider.value)
             }
         }
     }
 
-    Rectangle {
-        id: border
+    Slider {
+        id: brightness_slider
+
+        from: 1; to: 254
+        value: 254
+        stepSize: 1
+
+        anchors.topMargin: 30
+        anchors.bottomMargin: 30
+        anchors.top: green_slider.bottom
+        anchors.horizontalCenter: parent.horizontalCenter
+
+        onPressedChanged: {
+            if(!pressed)
+            {
+                manager.changeLights(red_slider.value, green_slider.value, blue_slider.value, value)
+            }
+        }
+    }
+
+    Text {
+        id: brightness_label_lo
+
+        anchors.right: brightness_slider.left
+        anchors.verticalCenter: brightness_slider.verticalCenter
+
+        font.family: "Material Design Font"
+        font.pixelSize: 12
+        text: MdiFont.Icon.brightness3
+    }
+
+    Text {
+        id: brightness_label_hi
+
+        anchors.left: brightness_slider.right
+        anchors.verticalCenter: brightness_slider.verticalCenter
+
+        font.family: "Material Design Font"
+        font.pixelSize: 12
+        text: MdiFont.Icon.brightness5
     }
 
     Rectangle {
@@ -105,8 +143,8 @@ Window {
         width: 50; height: 50
 
         border.color: "black"
-        anchors.margins: 40
-        anchors.top: green_slider.bottom
+        anchors.margins: 30
+        anchors.top: brightness_slider.bottom
         anchors.horizontalCenter: parent.horizontalCenter
 
         color: Qt.rgba(red_slider.value / 255, green_slider.value / 255, blue_slider.value / 255, 1.0)

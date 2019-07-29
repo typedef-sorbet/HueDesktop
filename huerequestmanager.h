@@ -77,9 +77,9 @@ public:
         mgr = new QNetworkAccessManager(this);
     }
 
-    Q_INVOKABLE void changeLights(float r, float g, float b, float a)
+    Q_INVOKABLE void changeLights(float r, float g, float b, int bri)
     {
-        qDebug() << "Recieved request to change lights to color (" << r << ", " << g << ", " << b << ", " << a << ")";
+        qDebug() << "Recieved request to change lights to color (" << r << ", " << g << ", " << b << ", " << bri << ")";
 
         // TODO scale for multiple lights? I don't exactly intend for this to go public, so I wouldn't need to do this for a while, if at all...
         std::vector<double> *xy = this->getRGBtoXY(r, g, b);
@@ -90,7 +90,7 @@ public:
         QNetworkRequest req_1, req_2;
 
         std::ostringstream data_stream;
-        data_stream << "{\"xy\": [" << x << ", " << y << "], \"bri\":" << (int)(254 * a) << "}";
+        data_stream << "{\"xy\": [" << x << ", " << y << "], \"bri\":" << bri << "}";
 
         req_1.setUrl(url_1);
         req_1.setHeader(QNetworkRequest::ContentTypeHeader, QVariant("application/json"));
