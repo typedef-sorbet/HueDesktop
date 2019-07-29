@@ -198,7 +198,7 @@ Window {
                 green_slider.value = green
                 blue_slider.value = blue
 
-                manager.changeLights(red, green, blue, Utils.calc_alpha(red, green, blue))
+                manager.changeLights(red, green, blue, brightness_slider.value)
             }
         }
     }
