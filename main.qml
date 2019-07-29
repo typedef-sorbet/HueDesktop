@@ -3,6 +3,7 @@ import QtQuick.Window 2.11
 import QtQuick.Controls 2.3
 import com.sanctity 1.0
 import "Utilities.js" as Utils
+import "Icon.js" as MdiFont
 
 Window {
     id: window
@@ -161,6 +162,25 @@ Window {
 
                 manager.changeLights(red, green, blue, Utils.calc_alpha(red, green, blue))
             }
+        }
+    }
+
+    RoundButton {
+        id: on_off
+
+        property bool next_action: false
+
+        anchors.margins: 30
+        anchors.top: hex_edit.bottom
+        anchors.horizontalCenter: parent.horizontalCenter
+        font.family: "Material Design Icons"
+        font.pixelSize: 24
+        text: MdiFont.Icon.power
+        opacity: 0.8
+
+        onPressed: {
+            manager.switchLights(next_action)
+            next_action = !next_action
         }
     }
 }

@@ -70,6 +70,9 @@ protected:
         return xyAsList;
     }
 public:
+    // Constants
+    static const bool LIGHTS_OFF = false;
+    static const int LIGHTS_ON = true;
     explicit HueRequestManager(QObject *parent = 0) : QObject(parent) {
         mgr = new QNetworkAccessManager(this);
     }
@@ -95,6 +98,26 @@ public:
         QByteArray data(data_stream.str().c_str());
 
         mgr->put(req_1, data);
+    }
+
+    Q_INVOKABLE void switchLights(bool onOrOff)
+    {
+        qDebug() << "Recieved request to turn the lights" << (onOrOff ? "on" : "off");
+
+        QUrl url("http://192.168.0.45/api/bqdaMSCscyVhBgZhkrF5ptFm2-NhJSAAg3rVmskl/groups/1/action");
+
+        QNetworkRequest req;
+
+        std::ostringstream string_builder;
+
+        string_builder << "{\"on\": " << (onOrOff ? "true" : "false") << "}";
+
+        req.setUrl(url);
+        req.setHeader(QNetworkRequest::ContentTypeHeader, QVariant("application/json"));
+
+        QByteArray data(string_builder.str().c_str());
+
+        mgr->put(req, data);
     }
 };
 

@@ -2,5 +2,7 @@
     <qresource prefix="/">
         <file>main.qml</file>
         <file>Utilities.js</file>
+        <file>Icon.js</file>
+        <file>materialdesignicons-webfont.ttf</file>
     </qresource>
 </RCC>
