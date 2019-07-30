@@ -15,6 +15,8 @@
 #include <QNetworkReply>
 #include <QThread>
 #include <QEventLoop>
+#include <QQuickView>
+#include <QQmlContext>
 
 class HueRequestManager : public QObject {
     Q_OBJECT
@@ -171,19 +173,42 @@ public:
         QJsonDocument doc = QJsonDocument::fromJson(reply->readAll());
         QJsonObject root = doc.object();
 
+        QStringList names;
+
         for(QString key : root.keys())
         {
             QString name = root.value(key).toObject().value("name").toString();
 
             // insert backwards so we can refer via user-spec'd name
             this->scenes.insert(name, key);
+
+            names.append(name);
         }
 
 //        for(QString key : this->scenes.keys())
 //        {
 //            qDebug() << key << ": " << this->scenes[key];
 //        }
+    }
 
+    Q_INVOKABLE void setScene(QString sceneName)
+    {
+        QUrl url("http://192.168.0.45/api/bqdaMSCscyVhBgZhkrF5ptFm2-NhJSAAg3rVmskl/groups/1/action");
+
+        QNetworkRequest req;
+
+        req.setUrl(url);
+        req.setHeader(QNetworkRequest::ContentTypeHeader, QVariant("application/json"));
+
+        std::ostringstream string_builder;
+
+        string_builder << "{\"scene\": \"" << this->scenes[sceneName].toStdString() << "\"}";
+
+        QByteArray data(string_builder.str().c_str());
+
+        qDebug() << data;
+
+        mgr->put(req, data);
     }
 };
 
