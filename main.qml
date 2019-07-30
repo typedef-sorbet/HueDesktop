@@ -17,6 +17,10 @@ Window {
 
     HueRequestManager {
         id: manager 
+
+        Component.onCompleted: {
+            manager.getScenes()
+        }
     }
 
     Slider {

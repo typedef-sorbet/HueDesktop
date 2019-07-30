@@ -14,6 +14,7 @@
 #include <QJsonDocument>
 #include <QNetworkReply>
 #include <QThread>
+#include <QEventLoop>
 
 class HueRequestManager : public QObject {
     Q_OBJECT
@@ -75,10 +76,12 @@ public:
     static const bool LIGHTS_ON = true;
     bool current_power_state;
     std::tuple<float, float, float, int> *buffered_request;
+    QMap<QString, QString> scenes;
     explicit HueRequestManager(QObject *parent = 0) : QObject(parent) {
         mgr = new QNetworkAccessManager(this);
         current_power_state = true;
         buffered_request = nullptr;
+        scenes = QMap<QString, QString>();
     }
 
     Q_INVOKABLE void changeLights(float r, float g, float b, int bri)
@@ -89,6 +92,7 @@ public:
         {
             qDebug() << "Buffering the request.";
 
+            // TODO is this free necessary?
             free(buffered_request);
             buffered_request = new std::tuple<float, float, float, int>(r, g, b, bri);
 
@@ -145,6 +149,41 @@ public:
         mgr->put(req, data);
 
         current_power_state = onOrOff;
+    }
+
+    Q_INVOKABLE void getScenes()
+    {
+        QUrl get_scenes_url("http://192.168.0.45/api/bqdaMSCscyVhBgZhkrF5ptFm2-NhJSAAg3rVmskl/scenes");
+
+        QNetworkRequest req(get_scenes_url);
+
+        QNetworkReply *reply;
+        QEventLoop loop;
+
+        reply = mgr->get(req);
+
+        connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
+
+        loop.exec();
+
+        // at this point, we should have gotten the scenes from the Bridge
+
+        QJsonDocument doc = QJsonDocument::fromJson(reply->readAll());
+        QJsonObject root = doc.object();
+
+        for(QString key : root.keys())
+        {
+            QString name = root.value(key).toObject().value("name").toString();
+
+            // insert backwards so we can refer via user-spec'd name
+            this->scenes.insert(name, key);
+        }
+
+//        for(QString key : this->scenes.keys())
+//        {
+//            qDebug() << key << ": " << this->scenes[key];
+//        }
+
     }
 };
 
