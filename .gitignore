@@ -71,3 +71,6 @@ Thumbs.db
 *.dll
 *.exe
 
+# User Specified
+notes.md
+
