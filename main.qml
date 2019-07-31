@@ -15,7 +15,7 @@ ApplicationWindow {
 
     color: "lightgrey"
 
-    property bool isOn: !on_off.next_action
+    property bool on_state: true
 
     HueRequestManager {
         id: manager 
@@ -241,7 +241,7 @@ ApplicationWindow {
             RoundButton {
                 id: on_off
 
-                property bool next_action: false
+                property bool next_action: !window.on_state
 
                 anchors.margins: 30
                 anchors.top: hex_edit.bottom
@@ -253,7 +253,7 @@ ApplicationWindow {
 
                 onPressed: {
                     manager.switchLights(next_action)
-                    next_action = !next_action
+                    window.on_state = next_action
                 }
             }
         }
@@ -321,7 +321,7 @@ ApplicationWindow {
             RoundButton {
                 id: on_off_scene
 
-                property bool next_action: !window.isOn
+                property bool next_action: !window.on_state
 
                 anchors.margins: 30
                 anchors.top: brightness_slider_scene.bottom
@@ -333,7 +333,7 @@ ApplicationWindow {
 
                 onPressed: {
                     manager.switchLights(next_action)
-                    next_action = !next_action
+                    window.on_state = next_action
                 }
             }
         }
