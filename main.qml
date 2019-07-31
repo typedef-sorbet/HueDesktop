@@ -15,6 +15,8 @@ ApplicationWindow {
 
     color: "lightgrey"
 
+    property bool isOn: !on_off.next_action
+
     HueRequestManager {
         id: manager 
 
@@ -260,7 +262,10 @@ ApplicationWindow {
             id: scenes_page
 
             ComboBox {
+                id: scene_selector
+
                 anchors.centerIn: parent
+                anchors.margins: 30
                 model: combo_model
 
                 currentIndex: 0
@@ -268,6 +273,67 @@ ApplicationWindow {
                 onCurrentIndexChanged: {
                     console.log("Scene changed to " + model[currentIndex])
                     manager.setScene(model[currentIndex])
+                }
+            }
+
+            Slider {
+                id: brightness_slider_scene
+
+                from: 1; to: 254
+                value: 254
+                stepSize: 1
+
+                anchors.topMargin: 30
+                anchors.bottomMargin: 30
+                anchors.top: scene_selector.bottom
+                anchors.horizontalCenter: parent.horizontalCenter
+
+                onPressedChanged: {
+                    if(!pressed)
+                    {
+                        manager.changeLights(red_slider.value, green_slider.value, blue_slider.value, value)
+                    }
+                }
+            }
+
+            Text {
+                id: brightness_label_lo_scene
+
+                anchors.right: brightness_slider_scene.left
+                anchors.verticalCenter: brightness_slider_scene.verticalCenter
+
+                font.family: "Material Design Font"
+                font.pixelSize: 12
+                text: MdiFont.Icon.brightness3
+            }
+
+            Text {
+                id: brightness_label_hi_scene
+
+                anchors.left: brightness_slider_scene.right
+                anchors.verticalCenter: brightness_slider_scene.verticalCenter
+
+                font.family: "Material Design Font"
+                font.pixelSize: 12
+                text: MdiFont.Icon.brightness5
+            }
+
+            RoundButton {
+                id: on_off_scene
+
+                property bool next_action: !window.isOn
+
+                anchors.margins: 30
+                anchors.top: brightness_slider_scene.bottom
+                anchors.horizontalCenter: parent.horizontalCenter
+                font.family: "Material Design Icons"
+                font.pixelSize: 24
+                text: MdiFont.Icon.power
+                opacity: 0.8
+
+                onPressed: {
+                    manager.switchLights(next_action)
+                    next_action = !next_action
                 }
             }
         }
