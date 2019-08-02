@@ -146,6 +146,8 @@ ApplicationWindow {
                     if(!pressed)
                     {
                         manager.changeLights(red_slider.value, green_slider.value, blue_slider.value, value)
+
+                        brightness_slider_scene.value = value
                     }
                 }
             }
@@ -292,6 +294,8 @@ ApplicationWindow {
                     if(!pressed)
                     {
                         manager.changeLights(red_slider.value, green_slider.value, blue_slider.value, value)
+
+                        brightness_slider.value = value
                     }
                 }
             }
