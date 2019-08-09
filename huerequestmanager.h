@@ -79,11 +79,25 @@ public:
     bool current_power_state;
     std::tuple<float, float, float, int> *buffered_request;
     QMap<QString, QString> scenes;
+    QMap<QString, QString> lights;
+    QMap<QString, QString> groups;
     explicit HueRequestManager(QObject *parent = 0) : QObject(parent) {
         mgr = new QNetworkAccessManager(this);
         current_power_state = true;
         buffered_request = nullptr;
         scenes = QMap<QString, QString>();
+        lights = QMap<QString, QString>();
+        groups = QMap<QString, QString>();
+    }
+    HueRequestManager(HueRequestManager& other)
+    {
+        mgr = other.mgr;
+        mgr->setParent(this);
+        current_power_state = other.current_power_state;
+        buffered_request = other.buffered_request;
+        scenes = other.scenes;
+        lights = other.lights;
+        groups = other.groups;
     }
 
     Q_INVOKABLE void changeLights(float r, float g, float b, int bri)
@@ -189,6 +203,46 @@ public:
 //        {
 //            qDebug() << key << ": " << this->scenes[key];
 //        }
+    }
+
+    Q_INVOKABLE void getLights()
+    {
+        // gets individual lights and groups from the root API json response
+
+        QUrl get_info_url("http://192.168.0.45/api/bqdaMSCscyVhBgZhkrF5ptFm2-NhJSAAg3rVmskl");
+
+        QNetworkRequest req(get_info_url);
+
+        QNetworkReply *reply;
+        QEventLoop loop;
+
+        reply = mgr->get(req);
+
+        connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
+
+        loop.exec();
+
+        // at this point, we should have gotten the json from the Bridge
+
+        QJsonDocument doc = QJsonDocument::fromJson(reply->readAll());
+        QJsonObject root = doc.object();
+
+        QJsonObject groups_obj = root.value("groups").toObject(), lights_obj = root.value("lights").toObject();
+
+        for(QString group_key : groups_obj.keys())
+        {
+            QString name = groups_obj.value(group_key).toObject().value("name").toString();
+            this->groups.insert(name, group_key);
+            qDebug() << name << ": " << group_key;
+        }
+
+        for(QString light_key : lights_obj.keys())
+        {
+            QString name = lights_obj.value(light_key).toObject().value("name").toString();
+            this->groups.insert(name, light_key);
+            qDebug() << name << ": " << light_key;
+        }
+
     }
 
     Q_INVOKABLE void setScene(QString sceneName)

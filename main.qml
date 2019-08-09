@@ -22,6 +22,7 @@ ApplicationWindow {
 
         Component.onCompleted: {
             manager.getScenes()
+            manager.getLights()
         }
     }
 
@@ -268,7 +269,7 @@ ApplicationWindow {
 
                 anchors.centerIn: parent
                 anchors.margins: 30
-                model: combo_model
+                model: scenes_model
 
                 currentIndex: 0
 
