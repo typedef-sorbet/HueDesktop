@@ -54,6 +54,7 @@ int main(int argc, char *argv[])
     ctxt->setContextProperty("scenes_model", QVariant::fromValue(sceneNames));
     ctxt->setContextProperty("lights_model", QVariant::fromValue(lightNames));
     ctxt->setContextProperty("groups_model", QVariant::fromValue(groupNames));
+    ctxt->setContextProperty("manager", &hrm);
 
     const QUrl url(QStringLiteral("qrc:/main.qml"));
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
@@ -62,8 +63,6 @@ int main(int argc, char *argv[])
             QCoreApplication::exit(-1);
     }, Qt::QueuedConnection);
     engine.load(url);
-
-//    HueRequestManager tryThis = engine.rootObjects().first()->findChild<HueRequestManager>();
 
     return app.exec();
 }

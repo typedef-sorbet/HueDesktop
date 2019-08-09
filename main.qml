@@ -17,15 +17,6 @@ ApplicationWindow {
 
     property bool on_state: true
 
-    HueRequestManager {
-        id: manager 
-
-        Component.onCompleted: {
-            manager.getScenes()
-            manager.getLights()
-        }
-    }
-
     header: TabBar {
         id: bar
         anchors.margins: 30
