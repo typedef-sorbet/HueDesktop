@@ -33,27 +33,10 @@ int main(int argc, char *argv[])
     hrm.getScenes();
     hrm.getLights();
 
-    QStringList sceneNames, lightNames, groupNames;
-
-    for(QString key : hrm.scenes.keys())
-    {
-        sceneNames.append(key);
-    }
-
-    for(QString key : hrm.lights.keys())
-    {
-        lightNames.append(key);
-    }
-
-    for(QString key : hrm.groups.keys())
-    {
-        groupNames.append(key);
-    }
-
     QQmlContext *ctxt = engine.rootContext();
-    ctxt->setContextProperty("scenes_model", QVariant::fromValue(sceneNames));
-    ctxt->setContextProperty("lights_model", QVariant::fromValue(lightNames));
-    ctxt->setContextProperty("groups_model", QVariant::fromValue(groupNames));
+    ctxt->setContextProperty("scenes_model", QVariant::fromValue(QStringList(hrm.scenes.keys())));
+    ctxt->setContextProperty("lights_model", QVariant::fromValue(QStringList(hrm.lights.keys())));
+    ctxt->setContextProperty("groups_model", QVariant::fromValue(QStringList(hrm.groups.keys())));
     ctxt->setContextProperty("manager", &hrm);
 
     const QUrl url(QStringLiteral("qrc:/main.qml"));
