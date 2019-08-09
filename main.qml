@@ -10,12 +10,18 @@ ApplicationWindow {
 
     visible: true
     width: 300
-    height: 540
+    height: 600
     title: qsTr("Hue Lights Controller")
 
     color: "lightgrey"
 
     property bool on_state: true
+
+    function getWhich()
+    {
+        var which_box = (lights_or_groups.currentIndex == 0 ? choose_which_light : choose_which_group)
+        return which_box.model[which_box.currentIndex]
+    }
 
     header: TabBar {
         id: bar
@@ -45,6 +51,70 @@ ApplicationWindow {
         Item {
             id: colors_page
 
+            ComboBox {
+                id: lights_or_groups
+
+                anchors.top: parent.top
+                anchors.left: parent.left
+                anchors.margins: 30
+                anchors.rightMargin: 25
+                width: 90
+
+                currentIndex: 0
+
+                model: ListModel {
+                    ListElement {
+                        text: "Light"
+                    }
+
+                    ListElement {
+                        text: "Group"
+                    }
+                }
+
+                onCurrentIndexChanged:
+                {
+                    if(model[currentIndex] === "Light")
+                    {
+                        choose_which_light.visible = true
+                        choose_which_group.visible = false
+                    }
+                    else
+                    {
+                        choose_which_light.visible = false
+                        choose_which_group.visible = true
+                    }
+                }
+            }
+
+            ComboBox {
+                id: choose_which_light
+
+                anchors.margins: 30
+                anchors.rightMargin: 25
+                anchors.top: parent.top
+                anchors.left: lights_or_groups.right
+
+                model: lights_model
+                visible: true
+
+                currentIndex: 0
+            }
+
+            ComboBox {
+                id: choose_which_group
+
+                anchors.margins: 30
+                anchors.rightMargin: 25
+                anchors.top: parent.top
+                anchors.left: lights_or_groups.right
+
+                model: groups_model
+                visible: false
+
+                currentIndex: 0
+            }
+
             Slider {
                 id: red_slider
 
@@ -63,7 +133,7 @@ ApplicationWindow {
                 onPressedChanged: {
                     if(!pressed)
                     {
-                        manager.changeLights(value, green_slider.value, blue_slider.value, brightness_slider.value)
+                        manager.changeLights(value, green_slider.value, blue_slider.value, brightness_slider.value, lights_or_groups.currentIndex, getWhich())
                     }
                 }
             }
@@ -76,7 +146,7 @@ ApplicationWindow {
                 anchors.leftMargin: 40
                 anchors.rightMargin: 40
                 anchors.topMargin: 15
-                anchors.top: parent.top
+                anchors.top: lights_or_groups.bottom
                 anchors.horizontalCenter: parent.horizontalCenter
                 orientation: Qt.Vertical
 
@@ -87,7 +157,7 @@ ApplicationWindow {
                 onPressedChanged: {
                     if(!pressed)
                     {
-                        manager.changeLights(red_slider.value, value, blue_slider.value, brightness_slider.value)
+                        manager.changeLights(red_slider.value, value, blue_slider.value, brightness_slider.value, lights_or_groups.currentIndex, getWhich())
                     }
                 }
             }
@@ -117,7 +187,7 @@ ApplicationWindow {
                 onPressedChanged: {
                     if(!pressed)
                     {
-                        manager.changeLights(red_slider.value, green_slider.value, value, brightness_slider.value)
+                        manager.changeLights(red_slider.value, green_slider.value, value, brightness_slider.value, lights_or_groups.currentIndex, getWhich())
                     }
                 }
             }
@@ -137,7 +207,7 @@ ApplicationWindow {
                 onPressedChanged: {
                     if(!pressed)
                     {
-                        manager.changeLights(red_slider.value, green_slider.value, blue_slider.value, value)
+                        manager.changeLights(red_slider.value, green_slider.value, blue_slider.value, value, lights_or_groups.currentIndex, getWhich())
 
                         brightness_slider_scene.value = value
                     }
@@ -227,7 +297,7 @@ ApplicationWindow {
                         green_slider.value = green
                         blue_slider.value = blue
 
-                        manager.changeLights(red, green, blue, brightness_slider.value)
+                        manager.changeLights(red, green, blue, brightness_slider.value, lights_or_groups.currentIndex, getWhich())
                     }
                 }
             }

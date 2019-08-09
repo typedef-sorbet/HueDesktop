@@ -17,6 +17,7 @@
 #include <QEventLoop>
 #include <QQuickView>
 #include <QQmlContext>
+#include <stdlib.h>
 
 class HueRequestManager : public QObject {
     Q_OBJECT
@@ -100,7 +101,7 @@ public:
         groups = other.groups;
     }
 
-    Q_INVOKABLE void changeLights(float r, float g, float b, int bri)
+    Q_INVOKABLE void changeLights(float r, float g, float b, int bri, int lightOrGroup, QString which)
     {
         qDebug() << "Recieved request to change lights to color (" << r << "," << g << "," << b << "," << bri << ").";
 
@@ -119,17 +120,24 @@ public:
         std::vector<double> *xy = this->getRGBtoXY(r, g, b);
         double x = xy->at(0), y = xy->at(1);
 
-        QUrl url_1("http://192.168.0.45/api/bqdaMSCscyVhBgZhkrF5ptFm2-NhJSAAg3rVmskl/groups/1/action");
+        // TODO do some string formatting here.
+        std::ostringstream string_builder;
+        QString which_object = (lightOrGroup == 0 ? this->lights : this->groups)[which];
+        string_builder << "http://192.168.0.45/api/bqdaMSCscyVhBgZhkrF5ptFm2-NhJSAAg3rVmskl/" << (lightOrGroup == 0 ? "lights" : "groups") << "/" << which_object.toStdString() << "/" << (lightOrGroup == 0 ? "state" : "action");
+        qDebug() << string_builder.str().c_str();
+        QUrl url_1(string_builder.str().c_str());
 
-        QNetworkRequest req_1, req_2;
+        QNetworkRequest req_1;
 
-        std::ostringstream data_stream;
-        data_stream << "{\"xy\": [" << x << ", " << y << "], \"bri\":" << bri << "}";
+        string_builder = std::ostringstream();
+        string_builder << "{\"xy\": [" << x << ", " << y << "], \"bri\":" << bri << "}";
+
+        qDebug() << string_builder.str().c_str();
 
         req_1.setUrl(url_1);
         req_1.setHeader(QNetworkRequest::ContentTypeHeader, QVariant("application/json"));
 
-        QByteArray data(data_stream.str().c_str());
+        QByteArray data(string_builder.str().c_str());
 
         mgr->put(req_1, data);
     }
@@ -239,7 +247,7 @@ public:
         for(QString light_key : lights_obj.keys())
         {
             QString name = lights_obj.value(light_key).toObject().value("name").toString();
-            this->groups.insert(name, light_key);
+            this->lights.insert(name, light_key);
             qDebug() << name << ": " << light_key;
         }
 
