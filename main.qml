@@ -63,6 +63,7 @@ ApplicationWindow {
                 currentIndex: 0
 
                 model: ListModel {
+                    id: lights_or_groups_model
                     ListElement {
                         text: "Light"
                     }
@@ -74,7 +75,8 @@ ApplicationWindow {
 
                 onCurrentIndexChanged:
                 {
-                    if(model[currentIndex] === "Light")
+                    // change the combo box
+                    if(lights_or_groups_model.get(currentIndex).text === "Light")
                     {
                         choose_which_light.visible = true
                         choose_which_group.visible = false
@@ -84,6 +86,14 @@ ApplicationWindow {
                         choose_which_light.visible = false
                         choose_which_group.visible = true
                     }
+
+                    console.log("Recieving info about " + lights_or_groups_model.get(currentIndex).text + " " + getWhich())
+                    var value_list = (lights_or_groups_model.get(currentIndex).text === "Light" ? manager.getCurrentLightState : manager.getCurrentGroupState)(getWhich())
+                    red_slider.value = value_list[0]
+                    green_slider.value = value_list[1]
+                    blue_slider.value = value_list[2]
+                    brightness_slider.value = value_list[3]
+                    brightness_slider_scene.value = value_list[3]
                 }
             }
 
@@ -99,6 +109,15 @@ ApplicationWindow {
                 visible: true
 
                 currentIndex: 0
+
+                onCurrentIndexChanged: {
+                    var value_list = manager.getCurrentLightState(getWhich())
+                    red_slider.value = value_list[0]
+                    green_slider.value = value_list[1]
+                    blue_slider.value = value_list[2]
+                    brightness_slider.value = value_list[3]
+                    brightness_slider_scene.value = value_list[3]
+                }
             }
 
             ComboBox {
@@ -113,6 +132,15 @@ ApplicationWindow {
                 visible: false
 
                 currentIndex: 0
+
+                onCurrentIndexChanged: {
+                    var value_list = manager.getCurrentGroupState(getWhich())
+                    red_slider.value = value_list[0]
+                    green_slider.value = value_list[1]
+                    blue_slider.value = value_list[2]
+                    brightness_slider.value = value_list[3]
+                    brightness_slider_scene.value = value_list[3]
+                }
             }
 
             Slider {

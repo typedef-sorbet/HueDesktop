@@ -82,6 +82,10 @@ public:
     QMap<QString, QString> scenes;
     QMap<QString, QString> lights;
     QMap<QString, QString> groups;
+
+    QMap<QString, QVariantList> currentGroupStates;
+    QMap<QString, QVariantList> currentLightStates;
+
     explicit HueRequestManager(QObject *parent = 0) : QObject(parent) {
         mgr = new QNetworkAccessManager(this);
         current_power_state = true;
@@ -103,7 +107,9 @@ public:
 
     Q_INVOKABLE void changeLights(float r, float g, float b, int bri, int lightOrGroup, QString which)
     {
-        qDebug() << "Recieved request to change lights to color (" << r << "," << g << "," << b << "," << bri << ").";
+        qDebug() << "Recieved request to change" << (lightOrGroup == 0 ? "light" : "group") << which << "to color (" << r << "," << g << "," << b << "," << bri << ").";
+
+        (lightOrGroup == 0 ? currentLightStates : currentGroupStates)[which] = QVariantList({(int)r, (int)g, (int)b, bri});
 
         if(current_power_state == LIGHTS_OFF)
         {
@@ -116,7 +122,6 @@ public:
             return;
         }
 
-        // TODO scale for multiple lights? I don't exactly intend for this to go public, so I wouldn't need to do this for a while, if at all...
         std::vector<double> *xy = this->getRGBtoXY(r, g, b);
         double x = xy->at(0), y = xy->at(1);
 
@@ -241,6 +246,7 @@ public:
         {
             QString name = groups_obj.value(group_key).toObject().value("name").toString();
             this->groups.insert(name, group_key);
+            this->currentGroupStates.insert(name, {255, 255, 255, 254});
             qDebug() << name << ": " << group_key;
         }
 
@@ -248,6 +254,7 @@ public:
         {
             QString name = lights_obj.value(light_key).toObject().value("name").toString();
             this->lights.insert(name, light_key);
+            this->currentLightStates.insert(name, {255, 255, 255, 254});
             qDebug() << name << ": " << light_key;
         }
 
@@ -271,6 +278,16 @@ public:
         qDebug() << data;
 
         mgr->put(req, data);
+    }
+
+    Q_INVOKABLE QVariantList getCurrentLightState(QString which)
+    {
+        return currentLightStates[which];
+    }
+
+    Q_INVOKABLE QVariantList getCurrentGroupState(QString which)
+    {
+        return currentGroupStates[which];
     }
 };
 
