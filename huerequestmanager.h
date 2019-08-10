@@ -260,16 +260,20 @@ public:
 
     }
 
-    Q_INVOKABLE void setScene(QString sceneName)
+    Q_INVOKABLE void setScene(QString sceneName, int bri, QString which)
     {
-        QUrl url("http://192.168.0.45/api/bqdaMSCscyVhBgZhkrF5ptFm2-NhJSAAg3rVmskl/groups/1/action");
+        std::ostringstream string_builder;
+        string_builder << "http://192.168.0.45/api/bqdaMSCscyVhBgZhkrF5ptFm2-NhJSAAg3rVmskl/groups/" << groups[which].toStdString() << "/action";
+        QUrl url(string_builder.str().c_str());
 
         QNetworkRequest req;
 
         req.setUrl(url);
         req.setHeader(QNetworkRequest::ContentTypeHeader, QVariant("application/json"));
 
-        std::ostringstream string_builder;
+        string_builder = std::ostringstream();
+
+        // Set the scene first
 
         string_builder << "{\"scene\": \"" << this->scenes[sceneName].toStdString() << "\"}";
 
@@ -278,6 +282,18 @@ public:
         qDebug() << data;
 
         mgr->put(req, data);
+
+        // Set the brightness second
+
+        string_builder = std::ostringstream();
+
+        string_builder << "{\"bri\": " << bri << "}";
+
+        QByteArray data_bri(string_builder.str().c_str());
+
+        qDebug() << data;
+
+        mgr->put(req, data_bri);
     }
 
     Q_INVOKABLE QVariantList getCurrentLightState(QString which)

@@ -364,8 +364,20 @@ ApplicationWindow {
 
                 onCurrentIndexChanged: {
                     console.log("Scene changed to " + model[currentIndex])
-                    manager.setScene(model[currentIndex])
+                    manager.setScene(model[currentIndex], brightness_slider_scene.value, group_selector.model[group_selector.currentIndex])
                 }
+            }
+
+            ComboBox {
+                id: group_selector
+
+                anchors.margins: 30
+                anchors.bottom: scene_selector.top
+                anchors.horizontalCenter: parent.horizontalCenter
+
+                model: groups_model
+
+                currentIndex: 0
             }
 
             Slider {
@@ -383,7 +395,7 @@ ApplicationWindow {
                 onPressedChanged: {
                     if(!pressed)
                     {
-                        manager.changeLights(red_slider.value, green_slider.value, blue_slider.value, value)
+                        manager.setScene(scene_selector.model[scene_selector.currentIndex], value, group_selector.model[group_selector.currentIndex])
 
                         brightness_slider.value = value
                     }
