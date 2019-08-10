@@ -57,7 +57,7 @@ ApplicationWindow {
                 anchors.top: parent.top
                 anchors.left: parent.left
                 anchors.margins: 30
-                anchors.rightMargin: 25
+                anchors.leftMargin: 20
                 width: 90
 
                 currentIndex: 0
